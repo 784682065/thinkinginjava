@@ -1,5 +1,6 @@
 package com.huzepeng.thinkinginjava.Concurrency21;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -44,16 +45,18 @@ public class AttemptLocking {
         final AttemptLocking al = new AttemptLocking();
         al.untimed();
         al.timed();
+        final CountDownLatch latch = new CountDownLatch(1);//1.增加一个"屏障"
 
         new Thread(){
             {setDaemon(true);}
             public void run(){
                 al.lock.lock();
                 System.out.println("acquired");
+                latch.countDown();
             }
         }.start();
 
-        TimeUnit.MILLISECONDS.sleep(1);
+        latch.await();
         al.untimed();
         al.timed();
 
